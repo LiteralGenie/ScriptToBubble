@@ -37,15 +37,13 @@ class CenteredParagraph:
 		return image
 
 	def _get_lines(self, lst):
-		# inits
-		ret= []
-
 		# create lines
+		ret= [CenteredLine(x, self) for x in lst]
+
+		# adjust position
 		total_height= self.num_lines * self.line_height
 		current_height= 0
-		for i,x in enumerate(lst):
-			l= CenteredLine(x, self)
-
+		for i,l in enumerate(ret):
 			if i == 0:
 				topmost_height= l.bbox.height
 				current_height+= l.bbox.height
@@ -57,8 +55,6 @@ class CenteredParagraph:
 			ypos-= total_height/2 # centering
 
 			l.bbox.pos= (None, ypos)
-
-			ret.append(l)
 
 		# clean up
 		return ret
@@ -76,4 +72,4 @@ class CenteredParagraph:
 
 	def __str__(self):
 		t= self.text.replace("\n","\\n")
-		return f'"{t}" | {self.bbox}'
+		return f'"{t}" | line_height={self.line_height} | spacing={self.spacing} | {self.bbox}'
