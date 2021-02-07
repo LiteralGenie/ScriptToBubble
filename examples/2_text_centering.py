@@ -16,7 +16,6 @@ mask= Mask.from_image(template_path, para)
 print(para.debug(), "\n")
 para.render(Image(filename=template_path)).save(filename='2_pre_center.png')
 
-
 # initial scan
 stride= 5
 x_min= 100
@@ -40,7 +39,7 @@ for x in candidates:
 	range_y= range(-(stride-1), stride)
 	for i in range_x:
 		for j in range_y:
-			s= mask.get_score(ctr[0] + i, ctr[1] + j)
+			s= mask.get_score(ctr[0]+i, ctr[1]+j)
 			ts.log(f"Checking candidates... | {(i,j)} | {s.score if s else None}")
 print()
 

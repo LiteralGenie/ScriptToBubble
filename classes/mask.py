@@ -4,7 +4,7 @@ from .paragraph_score import Wall, ParagraphScore
 
 class Mask:
 	"""
-	Caches scores + horiz walls + vert walls for a given mask
+	Caches scores + horiz walls + vert walls for a given pixel mask
 	"""
 
 	class ScoreList:
@@ -113,7 +113,7 @@ class Mask:
 		# 		return None
 
 		# get score
-		ps= ParagraphScore.scan(p, self)
+		ps= ParagraphScore.from_paragraph(p, self)
 
 		# @todo: doesnt work if start is offcenter
 		# check out of bounds

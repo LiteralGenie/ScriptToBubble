@@ -41,7 +41,6 @@ class LineScore:
 			kwargs['start']= coord
 			max_score= max(coord, 0)
 
-
 		if 0 <= left_col <= mask.shape[1]-1:
 			walls= mask.get_v_walls(left_col)
 			dists= Wall.get_dists(index=coord, walls=walls, **kwargs)
@@ -142,7 +141,7 @@ class ParagraphScore:
 	# 		return statistics.median(abs(x-med) for x in b)
 
 	@staticmethod
-	def scan(para, mask):
+	def from_paragraph(para, mask):
 		ret= ParagraphScore(para=para)
 
 		# horiz scores
