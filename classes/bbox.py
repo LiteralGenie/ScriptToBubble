@@ -1,6 +1,6 @@
 class Bbox:
 	def __init__(self, x,y, w,h, linked=None):
-		self._pos= (x,y) # BOTTOM-left corner
+		self._pos= (x,y) # BOTTOM-LEFT corner
 		self.size= (w,h)
 
 		if linked is None:

@@ -9,9 +9,7 @@ text= "AAAA\nAAAAA\nAAAAAA"
 
 para= CenteredParagraph(text=text, font=font_path, font_size=15, line_height=15, center=(150,150))
 para.draw(Image(filename=template_path))
-
-print(para)
-print("\t" + "\n\t".join(str(x) for x in para.lines))
+print(para.debug())
 
 img= para.render(Image(filename=template_path))
-img.save(filename='./bubble_text.png')
+img.save(filename='./1_bubble_text.png')

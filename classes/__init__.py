@@ -1,3 +1,4 @@
 from .bbox import Bbox
-from .centered_line import CenteredLine
-from .centered_paragraph import CenteredParagraph
+from .centered_paragraph import CenteredParagraph, CenteredLine
+from .paragraph_score import ParagraphScore, LineScore
+from .mask import Mask
