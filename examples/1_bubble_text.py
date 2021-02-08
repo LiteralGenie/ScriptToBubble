@@ -1,4 +1,4 @@
-from classes import *
+from classes import CenteredParagraph
 from wand.image import Image
 import utils
 

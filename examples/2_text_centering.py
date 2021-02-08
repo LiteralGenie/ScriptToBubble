@@ -1,4 +1,4 @@
-from classes import *
+from classes import CenteredParagraph, Mask
 from wand.image import Image
 import utils, cv2
 
