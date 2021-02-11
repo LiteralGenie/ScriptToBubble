@@ -46,6 +46,8 @@ print()
 # choose best position
 para.bbox.center= mask.sorted_scores[0].para.bbox.center
 para.render(Image(filename=template_path)).save(filename='2_post_center.png')
+im_text= cv2.imread("./2_post_center.png")
+cv2.imshow("..", im_text)
 
 # get heatmap of position scores
 heatmap= mask.get_heatmap(template_path)

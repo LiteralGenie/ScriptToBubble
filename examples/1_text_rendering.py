@@ -5,9 +5,10 @@ import utils
 
 template_path= utils.ROOT_DIR + "tests/test_data/bubbles/" + "small_round_1.png"
 font_path= utils.FONT_DIR + "Noir_regular.otf"
-text= "AAAA\nAAAAA\nAAAAAA"
+text= "Lorem ipsum\ndolor sit amet..."
 
-para= CenteredParagraph(text=text, font=font_path, font_size=15, line_height=15, center=(150,150))
+para= CenteredParagraph(text=text, center=(150,150),
+						font=font_path, font_size=12, line_height=12)
 para.draw(Image(filename=template_path))
 print(para.debug())
 
