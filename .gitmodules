@@ -1,9 +1,6 @@
-[submodule "data/BubblesV2"]
-	path = data/BubblesV2
-	url = https://github.com/LiteralGenie/BubblesV2
 [submodule "utils/Mask_RCNN"]
 	path = utils/Mask_RCNN
 	url = https://github.com/matterport/Mask_RCNN
 [submodule "utils/pyStatParser"]
 	path = utils/pyStatParser
-	url = https://github.com/emilmont/pyStatParser
+	url = https://github.com/LiteralGenie/pyStatParser
