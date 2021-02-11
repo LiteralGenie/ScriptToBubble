@@ -5,8 +5,9 @@ import unittest, utils
 
 class CenteredParagraphTests(unittest.TestCase):
 	def setUp(self):
+		self.text= "We have to go.\nI'm almost happy here."
 		self.para_args= dict(
-			text="We have to go.\nI'm almost happy here.",
+			text=self.text,
 			font= utils.FONT_DIR + "Noir_regular.otf",
 		)
 		self.im_args= dict(
@@ -19,6 +20,9 @@ class CenteredParagraphTests(unittest.TestCase):
 		init_cx= 100
 		init_cy= 200
 		para= CenteredParagraph(**self.para_args, center=(init_cx, init_cy))
+
+		# check num lines
+		self.assertEqual(para.num_lines, len(self.text.split("\n")))
 
 		# check center
 		self.assertEqual(para.bbox.center, (100,200))
@@ -79,10 +83,41 @@ class CenteredParagraphTests(unittest.TestCase):
 
 		para.bbox.center= (init_cx, init_cy)
 
+	def test_cache(self):
+		def flt(x):
+			return (float(x[0]), float(x[1]))
 
-	def test_line_move(self):
-		# @todo: check that moving line affects para center
-		pass
+		init_center= (150,150)
+		para= CenteredParagraph(**self.para_args, center=init_center)
+		self.assertEqual(flt(para.center), flt(init_center))
+
+		# test moving bbox
+		para= CenteredParagraph(**self.para_args, center=init_center)
+		cntr= para.center
+
+		para.bbox.pos= (1,1)
+		self.assertNotEqual(flt(para.center), flt(cntr))
+
+		# test moving line
+		para= CenteredParagraph(**self.para_args, center=init_center)
+		cntr= para.center
+
+		para.lines[0].bbox.pos= (1,1)
+		self.assertNotEqual(flt(para.center), flt(cntr))
+
+		# test changing one line (width)
+		print('init')
+		para= CenteredParagraph(**self.para_args, center=init_center)
+		print('getting pos')
+		pos= para.bbox.pos
+		size= para.bbox.size
+
+		print('changing')
+		para.lines[0].text= 'AAAAAAAAAAAAAAAAAAAAAA'
+		print('checking')
+		print(size, para.bbox.size)
+		print(pos, para.bbox.pos)
+		self.assertNotEqual(flt(para.bbox.pos), flt(pos))
 
 
 if __name__ == "__main__":

@@ -1,11 +1,16 @@
-class Bbox:
-	def __init__(self, x,y, w,h, linked=None):
+from .prop_cache import PropCache
+
+
+class Bbox(PropCache):
+	def __init__(self, x,y, w,h, linked_bbox=None, **kwargs):
 		self._pos= (x,y) # BOTTOM-LEFT corner
 		self.size= (w,h)
 
-		if linked is None:
-			linked= []
-		self.linked= linked
+		if linked_bbox is None:
+			linked_bbox= []
+		self.linked_bbox= linked_bbox
+
+		super().__init__(**kwargs)
 
 	def __str__(self):
 		return f"pos={self.pos} | size={self.size} | center={self.center}"
@@ -16,7 +21,7 @@ class Bbox:
 	@pos.setter
 	def pos(self, new_pos):
 		ret= list(self.pos)
-		new_linked= [list(x.pos) for x in self.linked]
+		new_linked= [list(x.pos) for x in self.linked_bbox]
 
 		assert len(self._pos) == len(new_pos)
 
@@ -29,8 +34,10 @@ class Bbox:
 					x[i]+= shift
 
 		self._pos= tuple(ret)
-		for x,y in zip(self.linked, new_linked):
+		for x,y in zip(self.linked_bbox, new_linked):
 			x.pos= tuple(y)
+
+		self.recache()
 
 	@property
 	def center(self):
@@ -40,7 +47,7 @@ class Bbox:
 	@center.setter
 	def center(self, new_center):
 		old_center= self.center
-		new_linked= [list(x.center) for x in self.linked]
+		new_linked= [list(x.center) for x in self.linked_bbox]
 		assert len(old_center) == len(new_center) == len(self.pos)
 
 		# old_pos + shift
@@ -54,8 +61,10 @@ class Bbox:
 					x[i]+= shift
 
 		self.pos= tuple(ret)
-		for x,y in zip(self.linked, new_linked):
+		for x,y in zip(self.linked_bbox, new_linked):
 			x.center= tuple(y)
+
+		self.recache()
 
 	@property
 	def x(self):

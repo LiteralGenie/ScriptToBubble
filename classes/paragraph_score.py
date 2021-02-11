@@ -1,4 +1,5 @@
 import statistics
+from functools import cached_property
 
 
 class LineScore:
@@ -13,7 +14,7 @@ class LineScore:
 		if typ is None:
 			self.typ= self.HORIZONTAL
 
-	@property
+	@cached_property
 	def score(self):
 		if self.left==0 or self.right==0:
 			return None
@@ -99,7 +100,7 @@ class ParagraphScore:
 		self.v_scores= []
 		self.para= para
 
-	@property
+	@cached_property
 	def score(self):
 		a= [x.score for x in self.h_scores] + [x.score for x in self.v_scores]
 		a= [x for x in a if x is not None]

@@ -14,5 +14,7 @@ class Timestamp:
 			ret= f"[{ret}]"
 		return ret
 
-	def log(self, msg):
+	def log(self, msg, escape=True):
+		if escape:
+			msg= msg.replace("\n", "\\n")
 		print(f"\r{self.time(True)} {msg}", end="")

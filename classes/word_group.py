@@ -1,4 +1,4 @@
-from utils.stat_parser import Parser
+from utils.pyStatParser.stat_parser import Parser
 from collections import deque
 
 
@@ -31,6 +31,12 @@ class WordGroup:
 	@property
 	def breakpoints(self):
 		return [i for i in range(len(self.words)) if self.words[i].is_break and i!=(len(self.words)-1)]
+	@property
+	def num_possibilites(self):
+		# each breakpoint is true or false (2 options)
+		# each unique possibility is some tuple of true / false
+		#
+		return 2**(len(self.breakpoints)-1)
 
 	@classmethod
 	def from_text(cls, text):
@@ -117,7 +123,7 @@ class WordGroup:
 			yield stack
 		yield []
 
-	def iter_breaks(self): # todo: test for dupes
+	def get_break_iter(self): # todo: test for dupes
 		opts= self.breakpoints
 		text= [str(x) for x in self.words]
 

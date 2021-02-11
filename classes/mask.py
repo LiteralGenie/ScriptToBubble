@@ -1,5 +1,6 @@
 import bisect, cv2, math, numpy as np
 from .paragraph_score import Wall, ParagraphScore
+from sortedcontainers import SortedList
 
 
 class Mask:
@@ -12,24 +13,21 @@ class Mask:
 		Sorted score list
 		"""
 		def __init__(self, mask):
-			self.scores= [] # score (number)
-			self.indexes= [] # coordinate (x,y)
 			self.mask= mask
+			self.lst= SortedList() # list of (score, index)
 
 		def __getitem__(self, item):
-			it= self.indexes[item]
+			it= self.lst[item]
 			if isinstance(it, list):
-				return [self.mask.scores[x] for x in it]
+				return [self.mask.scores[x[1]] for x in it]
 			else:
-				return self.mask.scores[it]
+				return self.mask.scores[it[1]]
 
 		def __len__(self):
-			return len(self.indexes)
+			return len(self.lst)
 
 		def insert(self, x):
-			ind= bisect.bisect_right(self.scores, x.score)
-			self.scores.insert(ind, x.score)
-			self.indexes.insert(ind, x.para.center)
+			self.lst.add((x.score, x.para.center))
 
 	def __init__(self, pixel_mask, para):
 		self.h_walls= {}
@@ -42,6 +40,13 @@ class Mask:
 			l={}, r={}, t={}, b={}
 		)
 		self.sorted_scores= self.ScoreList(self)
+
+	def walled_copy(self, para=None):
+		ret= self.__class__(pixel_mask=self.pixel_mask, para=para)
+		ret.v_walls= self.v_walls
+		ret.h_walls= self.h_walls
+		return ret
+
 
 	@classmethod
 	def from_image(cls, im_path, para):
@@ -59,6 +64,23 @@ class Mask:
 		)
 
 		return cls(pixel_mask=mask[1:h+1, 1:w+1], para=para)
+
+	# todo: test mask shape
+	@property
+	def mask_width(self):
+		ret= np.array(self.pixel_mask, dtype=bool)
+		ret= np.sum(ret, axis=1)
+		ret= max(ret)
+		return ret
+	@property
+	def mask_height(self):
+		ret= np.array(self.pixel_mask, dtype=bool)
+		ret= np.sum(ret, axis=0)
+		ret= max(ret)
+		return ret
+	@property
+	def mask_shape(self):
+		return self.mask_width, self.mask_height
 
 	def __getitem__(self, item):
 		return self.pixel_mask.__getitem__(item)
@@ -194,8 +216,8 @@ class Mask:
 
 		return heatmap
 
-	# get [n] best scores whose x & y coordinates are at least [thresh+1] pixels apart
-	def filter_candidates(self, n, thresh):
+	# get [n] best scores whose x & y coordinates are at least [min_dist+1] pixels apart
+	def filter_candidates(self, n, min_dist=1):
 		ret= []
 
 		# filter candidates
@@ -208,7 +230,7 @@ class Mask:
 			diff_x= abs(pos_a[0] - pos_b[0])
 			diff_y= abs(pos_a[1] - pos_b[1])
 
-			return (diff_x <= thresh) and (diff_y <= thresh)
+			return (diff_x <= min_dist) and (diff_y <= min_dist)
 
 		exclude= set()
 		ind= 0
