@@ -13,4 +13,4 @@ para.draw(Image(filename=template_path))
 print(para.debug())
 
 img= para.render(Image(filename=template_path))
-img.save(filename='./1_text_rendering.png')
+img.save(filename='1_text_rendering.png')

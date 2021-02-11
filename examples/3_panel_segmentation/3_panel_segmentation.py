@@ -3,7 +3,7 @@ from utils.segment_utils import *
 
 
 # inits
-im_path= r"./3-0_input_1.png"
+im_path= r"3-0_input_1.png"
 im= cv2.imread(im_path)
 im_gray= cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 

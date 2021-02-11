@@ -15,4 +15,4 @@ Requires Python 3.8+. See `/examples/` for example code.
 1. Unmerge panels that are bridged by speech bubble. (Split contour by concave vertices and remerge.)
 2. Train bubble detection model
 3. GUI
-4. Photoshop script
+4. Redo prop caching for classes

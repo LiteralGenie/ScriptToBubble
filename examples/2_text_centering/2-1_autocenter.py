@@ -14,7 +14,7 @@ mask= Mask.from_image(template_path, para)
 
 # show image + paragraph info
 print(para.debug(), "\n")
-para.render(Image(filename=template_path)).save(filename='2_pre_center.png')
+para.render(Image(filename=template_path)).save(filename='2-1_pre_center.png')
 
 # initial scan
 stride= 5
@@ -29,7 +29,7 @@ for i in range(x_min, x_max, stride):
 		ts.log(f"Initial scan... | {(i,j)} | {s.score if s else None}")
 print()
 
-# find most promising locations and rescan
+# find most promising locations and rescan with denser search area
 num_candidates= 10
 candidates= mask.filter_candidates(num_candidates, stride-1)
 
@@ -45,13 +45,13 @@ print()
 
 # choose best position
 para.bbox.center= mask.sorted_scores[0].para.bbox.center
-para.render(Image(filename=template_path)).save(filename='2_post_center.png')
-im_text= cv2.imread("./2_post_center.png")
+para.render(Image(filename=template_path)).save(filename='2-1_post_center.png')
+im_text= cv2.imread("2-1_post_center.png")
 cv2.imshow("..", im_text)
 
 # get heatmap of position scores
 heatmap= mask.get_heatmap(template_path)
-cv2.imwrite("./2_heatmap.png", heatmap)
+cv2.imwrite("2-1_heatmap.png", heatmap)
 cv2.imshow(".", heatmap)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
