@@ -2,16 +2,17 @@ Dumps a text script onto a comic page with empty speech bubbbles.
 
 ## Setup
 
-Requires Python 3.8+
-See /examples/ for example code.
+Requires Python 3.8+. See `/examples/` for example code.
 
 1. `git clone https://github.com/LiteralGenie/ScriptToBubble/`
 2. `cd ScriptToBubble`
 3. `git submodule init`
 4. `git submodule status`
+5. `python -m pip install -r requirements.txt`
+6. `python -m nltk.downloader all`
 
 ### Todo
-1. Unmerge panels that are bridged by speech bubble.
-   - (Find combination of 3 to 4 sided polygons with best IoU score and highest aggregate overlap with original contour area?)
-2. GUI
-3. Photoshop script
+1. Unmerge panels that are bridged by speech bubble. (Split contour by concave vertices and remerge.)
+2. Train bubble detection model
+3. GUI
+4. Photoshop script
