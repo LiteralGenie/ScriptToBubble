@@ -12,7 +12,8 @@ Requires Python 3.8+. See `/examples/` for example code.
 6. `python -m nltk.downloader all`
 
 ### Todo
-1. Unmerge panels that are bridged by speech bubble. (Split contour by concave vertices and remerge.)
-2. Train bubble detection model
-3. GUI
-4. Redo prop caching for classes
+1. Unmerge panels that are bridged by speech bubble. (Split contour by concave vertices and regroup vertices.)
+2. Infer panel ordering.   
+3. Train bubble detection model (use segmented panels)
+4. GUI
+5. Redo prop caching
