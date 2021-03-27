@@ -2,7 +2,7 @@
 
 ### Setup
 
-Requires Python 3.8+. See `/examples/` for example code.
+Requires Python 3.8+. See `/examples/` for usage.
 
 1. `git clone https://github.com/LiteralGenie/ScriptToBubble/`
 2. `cd ScriptToBubble`
@@ -29,9 +29,9 @@ Requires Python 3.8+. See `/examples/` for example code.
 5. Identify best text placement and shaping. 
    - The "shape" of a paragraph refers to the position of the line-breaks. Possible line break insertion points are determined by identifying clause boundaries and certain part-of-speech tags for each word / phrase. 
    - The score for a given position / shaping is calculated using rays that extend from the edges of the text ([example](https://files.catbox.moe/07gz7n.png)). Currently, the position / shaping that gives the most balanced ray distributions vertically / horizontally is assigned the best score.
-   <details><summary>example (from `/examples/2_text_centering/`)</summary><img src=https://raw.githubusercontent.com/LiteralGenie/ScriptToBubble/master/examples/2_text_centering/2_2_merged.png>
+   <details><summary>example (from /examples/2_text_centering/)</summary><img src=https://raw.githubusercontent.com/LiteralGenie/ScriptToBubble/master/examples/2_text_centering/2-2_merged.png>
    <br>left: Text auto-centered and with line-breaks auto-inserted
-   <br>right: Heatmap of scores for each position (with the text shape shown on left)</details>
+   <br>right: Heatmap of scores for each center location (with the text shape shown on left)</details>
 
 ### Todo
 1. ~~Unmerge panels that are bridged by speech bubble. (Split contour by concave vertices and regroup vertices.)~~
