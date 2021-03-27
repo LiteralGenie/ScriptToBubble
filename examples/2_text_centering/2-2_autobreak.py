@@ -1,11 +1,12 @@
 from classes import WordGroup, CenteredParagraph, Mask, Image
 from utils.centering_utils import get_2d_iter
 from utils.pyStatParser.stat_parser import Parser
-import utils, cv2, bisect
+import utils, cv2, bisect, numpy as np
 
 
 # inits
 ts= utils.Timestamp()
+im_lst= []
 
 sentence= 'I went against my heart and I made a choice.' + ' To accept her.' # ' It was something I had to do.'
 # sentence= 'AL forces are sequentially warping in from warp-safe zones 3 billion kilometers outside of the system.'
@@ -82,16 +83,23 @@ best_para= CenteredParagraph(text=others[0]['text'], center=others[0]['center'],
 best_mask= others[0]['mask']
 
 # show best paragraph
-best_para.render(Image(filename=template_path)).save(filename='2-2_post_center.png')
-best_im= cv2.imread('./2-2_post_center.png')
+im_lst.append(dict(
+	name="2-2_post_center.png",
+	im=best_para.render(Image(filename=template_path), as_numpy=True),
+))
 
 # debug
 heatmap= best_mask.get_heatmap(template_path)
-cv2.imwrite("./2-2_heatmap.png", heatmap)
-
-cv2.imshow(".", heatmap)
-cv2.imshow('..', best_im)
 tree.draw() # todo: save tree to png
+im_lst.append(dict(
+	name="2-2_heatmap.png",
+	im=heatmap,
+))
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# output debug images
+merged= np.concatenate([x['im'] for x in im_lst], axis=1)
+merged= cv2.cvtColor(merged, cv2.COLOR_RGB2BGR)
+cv2.imwrite("2-2_merged.png", merged)
+
+for x in im_lst:
+	cv2.imwrite(x['name'], x['im'])

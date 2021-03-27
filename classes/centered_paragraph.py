@@ -3,7 +3,7 @@ from .prop_cache import PropCache
 from wand.drawing import Drawing
 from wand.image import Image
 from functools import cached_property
-import re, logging, os
+import re, logging, os, numpy as np
 
 
 class CenteredLine(PropCache):
@@ -136,13 +136,16 @@ class CenteredParagraph(PropCache):
 			ret.draw= self.draw
 		return ret
 
-	def render(self, image):
+	def render(self, image, as_numpy=False):
 		d= self.draw.clone()
 		for l in self.lines:
 			pos= l.bbox.pos
 			d.text(int(pos[0]), int(pos[1]), l.text)
 
 		d(image)
+
+		if as_numpy:
+			image= np.array(image)[:,:,:3]
 		return image
 
 	def _get_lines(self, lst, center, metrics=None):

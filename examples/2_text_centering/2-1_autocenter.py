@@ -1,6 +1,6 @@
 from classes import CenteredParagraph, Mask
 from wand.image import Image
-import utils, cv2
+import utils, cv2, numpy as np
 
 
 # inits
@@ -8,13 +8,17 @@ ts= utils.Timestamp()
 template_path= utils.ROOT_DIR + "tests/test_data/bubbles/" + "big_crop_2.png"
 font_path= utils.FONT_DIR + "Noir_regular.otf"
 text= "We have to go.\nI'm almost\nhappy here."
+im_lst= []
 
 para= CenteredParagraph(text=text, font=font_path, font_size=15, line_height=12, center=(140,160))
 mask= Mask.from_image(template_path, para)
 
 # show image + paragraph info
 print(para.debug(), "\n")
-para.render(Image(filename=template_path)).save(filename='2-1_pre_center.png')
+im_lst.append(dict(
+	name="2-1_pre_center.png",
+	im=para.render(Image(filename=template_path), as_numpy=True),
+))
 
 # initial scan
 stride= 5
@@ -45,13 +49,25 @@ print()
 
 # choose best position
 para.bbox.center= mask.sorted_scores[0].para.bbox.center
-para.render(Image(filename=template_path)).save(filename='2-1_post_center.png')
-im_text= cv2.imread("2-1_post_center.png")
-cv2.imshow("..", im_text)
+# cv2.imshow("..", cv2.imread("2-1_post_center.png"))
+im_lst.append(dict(
+	name="2-1_post_center.png",
+	im=para.render(Image(filename=template_path), as_numpy=True),
+))
 
 # get heatmap of position scores
 heatmap= mask.get_heatmap(template_path)
-cv2.imwrite("2-1_heatmap.png", heatmap)
-cv2.imshow(".", heatmap)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imwrite("2-1_heatmap.png", heatmap)
+# cv2.imshow(".", heatmap); cv2.waitKey(0); cv2.destroyAllWindows()
+im_lst.append(dict(
+	name="2-1_heatmap.png",
+	im=heatmap,
+))
+
+# output debug images
+merged= np.concatenate([x['im'] for x in im_lst], axis=1)
+merged= cv2.cvtColor(merged, cv2.COLOR_RGB2BGR)
+cv2.imwrite("2-1_merged.png", merged)
+
+for x in im_lst:
+	cv2.imwrite(x['name'], x['im'])
