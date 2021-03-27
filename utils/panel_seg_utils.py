@@ -204,10 +204,10 @@ def get_concavities(contour, thresh=20, min_length=150):
 		angle= get_vertex_angle(prev_pt, cur_pt, next_pt)
 		if 360-thresh <= angle <= 360:
 			ret.append(ind)
-
-			if d_ab < min_length or d_cb < min_length:
-				# print(cur_pt, d_ab, d_cb)
-				continue
+			#
+			# if d_ab < min_length or d_cb < min_length:
+			# 	# print(cur_pt, d_ab, d_cb)
+			# 	continue
 
 	# return
 	ret.sort()
@@ -267,7 +267,7 @@ def get_contour_overlap(cntr_1, cntr_2, boxes=None):
 
 # returns 2-tuples of indices of overlapping contours
 # first index is always larger contour
-def iter_overlaps(contours, thresh=0.85):
+def iter_overlaps(contours, thresh=0.5):
 	boxes= [cv2.boundingRect(x) for x in contours]
 	for i,j in itertools.combinations(range(len(contours)), 2):
 		# inits
@@ -281,11 +281,127 @@ def iter_overlaps(contours, thresh=0.85):
 			continue
 
 		# get actual overlap
-		if get_contour_overlap(base, other, [base_bbox, other_bbox]):
+		if get_contour_overlap(base, other, [base_bbox, other_bbox]) >= thresh:
 			_,_,a1= _get_bbox_info(base_bbox)
 			_,_,a2= _get_bbox_info(other_bbox)
 
 			if a1 >= a2:
-				yield i,j
-			else:
 				yield j,i
+			else:
+				yield i,j
+
+
+# split contour with n cavities into n closed contours
+def divide_by_cavity(contour, caves):
+	ret= []
+
+	ind= 0
+	if len(caves) > 1:
+		while ind < len(caves)-1:
+			c= caves[ind]
+			c_next= caves[ind+1]
+
+			tmp= contour[c:c_next+1]
+			ret.append(tmp)
+
+			ind+= 1
+
+		# join first / last
+		tmp= list(contour[caves[ind]:]) + list(contour[:caves[0]+1])
+		ret.append(np.array(tmp))
+	else:
+		ret= [contour]
+
+	return ret
+
+
+def segment_panels(im_path):
+	# inits
+	ret= dict(contours=None, debug=[])
+	im= cv2.imread(im_path)
+	im_gray= cv2.cvtColor(im.copy(), cv2.COLOR_BGR2GRAY)
+	ret['image']= im
+
+
+	# threshold and find contours
+	_, im_gray= cv2.threshold(im_gray, 240, 255, cv2.THRESH_BINARY)
+	contours,hierarchy = cv2.findContours(im_gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	ret['debug'].append(dict(im=cv2.cvtColor(im_gray, cv2.COLOR_GRAY2BGR), name="post_thresh"))
+
+
+	# filter contours
+	canvas= np.zeros(im.shape, dtype=np.uint8)
+	tmp= []
+	tmp2= [x for i,x in enumerate(contours) if hierarchy[0][i][3] == -1]
+	for i,x in enumerate(contours):
+		if hierarchy[0][i][3] > 0: # only outermost contours
+			continue
+		if cv2.contourArea(x) < 100*100: # only if suff. large
+			continue
+		if hierarchy[0][i][3] == -1 and len(tmp2) <= 2: # remove page-sized contour
+			continue
+		tmp.append(x)
+	contours= tmp
+	out_im= draw_contours(contours, canvas.copy(), markers=False)
+	ret['debug'].append(dict(im=out_im, name="post_filter"))
+
+
+	# smooth edges
+	for i,cntr in enumerate(contours):
+		epsilon= 0.01*cv2.arcLength(cntr, True)
+		contours[i]= cv2.approxPolyDP(cntr, epsilon, True)
+	out_im= draw_contours(contours, canvas.copy(), markers=True)
+	ret['debug'].append(dict(im=out_im, name="post_smoothing"))
+
+
+	# merge clustered points
+	for i,cntr in enumerate(contours):
+		filtered= merge_points(cntr)
+		if len(filtered):
+			contours[i]= filtered
+	out_im= draw_contours(contours, canvas.copy(), markers=True)
+	# ret['debug'].append(dict(im=out_im, name="post_clustering"))
+
+
+	# id concavities
+	concavities= []
+	for i,cntr in enumerate(contours):
+		caves= get_concavities(cntr)
+		for j in caves:
+			coord= tuple(cntr[j][0])
+			cv2.drawMarker(out_im, coord, (0,255,0), thickness=2)
+		concavities.append(caves)
+	ret['debug'].append(dict(im=out_im, name="post_clustering"))
+
+
+	# subdivide contour if multiple concavities
+	tmp_lst= list(enumerate(contours))
+	for i,cntr in tmp_lst:
+		if len(concavities[i]) > 1:
+			tmp= divide_by_cavity(cntr, concavities[i])
+			contours[i]= np.array(tmp[0])
+			contours+= tmp[1:]
+	out_im= draw_contours(contours, canvas.copy(), markers=True)
+	ret['debug'].append(dict(im=out_im, name="post_division"))
+
+
+	# close contours
+	contours= [cv2.convexHull(x) for x in contours]
+	out_im= draw_contours(contours, canvas.copy(), markers=True)
+	ret['debug'].append(dict(im=out_im, name="post_hull"))
+
+
+	# remove nested contours
+	while True:
+		for x in iter_overlaps(contours):
+			contours.pop(x[0])
+			break # restart for-loop because contours have changed
+		else:
+			break
+	out_im= draw_contours(contours, canvas.copy(), markers=True)
+	ret['debug'].append(dict(im=out_im, name="post_unoverlap"))
+
+
+	# return
+	ret['contours']= contours
+	return ret

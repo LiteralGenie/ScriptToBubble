@@ -83,6 +83,7 @@ class CenteredParagraphTests(unittest.TestCase):
 
 		para.bbox.center= (init_cx, init_cy)
 
+	# check if changing one property affects others (eg change in text should affect center)
 	def test_cache(self):
 		def flt(x):
 			return (float(x[0]), float(x[1]))
@@ -106,17 +107,11 @@ class CenteredParagraphTests(unittest.TestCase):
 		self.assertNotEqual(flt(para.center), flt(cntr))
 
 		# test changing one line (width)
-		print('init')
 		para= CenteredParagraph(**self.para_args, center=init_center)
-		print('getting pos')
 		pos= para.bbox.pos
 		size= para.bbox.size
 
-		print('changing')
 		para.lines[0].text= 'AAAAAAAAAAAAAAAAAAAAAA'
-		print('checking')
-		print(size, para.bbox.size)
-		print(pos, para.bbox.pos)
 		self.assertNotEqual(flt(para.bbox.pos), flt(pos))
 
 
